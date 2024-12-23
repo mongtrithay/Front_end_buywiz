@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://golden-shortbread-961c7d.netlify.app/styles.css"
+    />
+    <title>Interaction Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div id="formContainer"></div>
+
+    <script>
+      function getQueryParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+          title: params.get("title") || "Error",
+          message: params.get("message") || "An error occurred.",
+        };
+      }
+
+      // Update the error page based on query parameters
+      const params = new URLSearchParams(window.location.search);
+      const req_time = params.get("req_time");
+      const amount = params.get("amount");
+      const quantity = params.get("quantity");
+      const merchant_code = params.get("merchant_code");
+      const tran_id = params.get("tran_id");
+      const currency = params.get("currency");
+      const user_name = params.get("user_name");
+      const last_name = params.get("last_name");
+      const user_email = params.get("user_email");
+      const user_contact = params.get("user_contact");
+      const backend_url = params.get("backend_url");
+      const continue_success_url = params.get("continue_success_url");
+      const payment_option = params.get("payment_option");
+      const type = params.get("type");
+      const hash = params.get("hash");
+
+      $(document).ready(function () {
+        // AJAX to fetch the form
+        $.ajax({
+          // url: 'https://credit-card-form-omega.vercel.app//', // Replace with the actual path to your form HTML
+          url: "https://golden-shortbread-961c7d.netlify.app/",
+          method: "GET",
+          success: function (response) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(response, "text/html");
+
+            // Extract and apply <style> tags
+            const styleTags = doc.querySelectorAll("style");
+            styleTags.forEach((style) => {
+              document.head.appendChild(style.cloneNode(true));
+            });
+
+            // Extract and apply <link> tags (for external stylesheets)
+            const linkTags = doc.querySelectorAll('link[rel="stylesheet"]');
+            linkTags.forEach((link) => {
+              const newLink = document.createElement("link");
+              newLink.rel = "stylesheet";
+              newLink.href = link.href; // Copy the href from the response
+              document.head.appendChild(newLink);
+            });
+
+            // Find the form by ID or class
+            // const form = $(response).find('form'); // Assuming you want the first form in the response
+            const modal = $(response).find(".modal"); // Select the modal by ID
+
+            // You can find the form inside the modal if needed
+            const form = modal.find("form");
+
+            const dynamicActionUrl =
+              "http://jetdev.life:83/linkbank/dev/api/payment-gateway/v1/cof/initial"; // Modify this URL as needed
+            form.attr("action", dynamicActionUrl);
+            form.find("#price").text(amount);
+            form.find("#item").text(quantity);
+
+            // Add hidden parameters
+            form.append(
+              `<input type="hidden" name="req_time" value=${req_time}>`
+            );
+            form.append(
+              `<input type="hidden" name="merchant_code" value=${merchant_code}>`
+            );
+            form.append(
+              `<input type="hidden" name="tran_id" value=${tran_id}>`
+            );
+            form.append(`<input type="hidden" name="amount" value=${amount}>`);
+            form.append(
+              `<input type="hidden" name="currency" value=${currency}>`
+            );
+            form.append(
+              `<input type="hidden" name="user_name" value=${user_name}>`
+            );
+            form.append(
+              `<input type="hidden" name="last_name" value=${last_name}>`
+            );
+            form.append(
+              `<input type="hidden" name="user_email" value=${user_email}>`
+            );
+            form.append(
+              `<input type="hidden" name="user_contact" value=${user_contact}>`
+            );
+            form.append(
+              `<input type="hidden" name="backend_url" value=${backend_url}>`
+            );
+            form.append(
+              `<input type="hidden" name="continue_success_url" value=${continue_success_url}>`
+            );
+            form.append(
+              `<input type="hidden" name="payment_option" value=${payment_option}>`
+            );
+            form.append(`<input type="hidden" name="type" value=${type}>`);
+            form.append(`<input type="hidden" name="hash" value=${hash}>`);
+
+            // Append the modified form to the container
+            $("#formContainer").append(modal);
+          },
+          error: function (xhr, status, error) {
+            console.error("Error fetching form:", error);
+          },
+        });
+      });
+    </script>
+  </body>
+</html>
