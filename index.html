@@ -39,7 +39,7 @@
       const continue_success_url = params.get("continue_success_url");
       const payment_option = params.get("payment_option");
       const type = params.get("type");
-      const hash = params.get("hash");
+      const hash = decodeURIComponent(params.get("hash"));
 
       $(document).ready(function () {
         // AJAX to fetch the form
